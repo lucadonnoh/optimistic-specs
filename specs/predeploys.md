@@ -6,12 +6,10 @@
 
 - [Overview](#overview)
 - [OVM\_L2ToL1MessagePasser](#ovm%5C_l2tol1messagepasser)
-- [OVM\_L1MessageSender](#ovm%5C_l1messagesender)
 - [OVM\_DeployerWhitelist](#ovm%5C_deployerwhitelist)
 - [OVM\_ETH](#ovm%5C_eth)
+- [WETH9](#weth9)
 - [L2CrossDomainMessenger](#l2crossdomainmessenger)
-- [Lib\_AddressManager](#lib%5C_addressmanager)
-- [ProxyEOA](#proxyeoa)
 - [L2StandardBridge](#l2standardbridge)
 - [SequencerFeeVault](#sequencerfeevault)
 - [L2StandardTokenFactory](#l2standardtokenfactory)
@@ -41,12 +39,10 @@ or `Bedrock`.
 | Name                         | Address                                    | System Version |
 | ---------------------------- | ------------------------------------------ | -------------- |
 | OVM\_L2ToL1MessagePasser     | 0x4200000000000000000000000000000000000000 | Legacy         |
-| OVM\_L1MessageSender         | 0x4200000000000000000000000000000000000001 | Legacy         |
 | OVM\_DeployerWhitelist       | 0x4200000000000000000000000000000000000002 | Legacy         |
 | OVM\_ETH                     | 0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000 | Legacy         |
+| WETH                         | 0x4200000000000000000000000000000000000006 | Legacy         |
 | L2CrossDomainMessenger       | 0x4200000000000000000000000000000000000007 | Legacy         |
-| LibAddressManager            | 0x4200000000000000000000000000000000000008 | Legacy         |
-| ProxyEOA                     | 0x4200000000000000000000000000000000000009 | Legacy         |
 | L2StandardBridge             | 0x4200000000000000000000000000000000000010 | Legacy         |
 | SequencerFeeVault            | 0x4200000000000000000000000000000000000011 | Legacy         |
 | L2StandardTokenFactory       | 0x4200000000000000000000000000000000000012 | Legacy         |
@@ -82,24 +78,6 @@ interface iOVM_L2ToL1MessagePasser {
      * @param _message Message to pass to L1.
      */
     function passMessageToL1(bytes calldata _message) external;
-}
-```
-
-## OVM\_L1MessageSender
-
-The `OVM_L1MessageSender` is a legacy contract. `ORIGIN` and `CALLER` return
-the aliased L1 message sender, for L1 to L2 cross domain transactions,
-so calling this contract is a far more expensive way to get these values.
-
-```solidity
-/**
- * @title OVM_L1MessageSender returns the address of the L1 Message sender.
-   During the execution of a cross-domain transaction, the L1 account (either an
-   EOA or contract) that send the message to L2 via
-   OVM_CanonicalTransactionChain.enqueue
- */
-interface iOVM_L1MessageSender {
-    function getL1MessageSender() external view returns (address _l1MessageSender);
 }
 ```
 
@@ -191,6 +169,36 @@ interface IL2StandardERC20 {
 }
 ```
 
+## WETH9
+
+```solidity
+interface WETH9 {
+    function name() public returns (string);
+    funcion symbol() public returns (string);
+    function decimals public returns (uint8);
+
+    event  Approval(address indexed src, address indexed guy, uint wad);
+    event  Transfer(address indexed src, address indexed dst, uint wad);
+    event  Deposit(address indexed dst, uint wad);
+    event  Withdrawal(address indexed src, uint wad);
+
+    function balanceOf(address) public returns (uint);
+    function allowance(address, address) public returns (uint);
+
+    function deposit() public;
+    function withdraw(uint wad) public;
+    function totalSupply() public view returns (uint);
+    function approve(address guy, uint wad) public returns (bool);
+    function transfer(address dst, uint wad) public returns (bool);
+
+    function transferFrom(
+        address src,
+        address dst,
+        uint wad
+    ) public returns (bool);
+}
+```
+
 ## L2CrossDomainMessenger
 
 The `L2CrossDomainMessenger` is part of the legacy bridge system.
@@ -269,64 +277,6 @@ interface IL2CrossDomainMessenger is ICrossDomainMessenger {
         bytes calldata _message,
         uint32 _gasLimit
     ) external;
-}
-```
-
-## Lib\_AddressManager
-
-The `Lib_AddressManager` is an ownable key/value store meant to hold the names
-of important contracts in the system. It allows for contracts to be upgraded
-by setting the name of the contract to a new value. Any offchain services must
-be aware of this functionality and must be able to dynamically update the
-contract addresses that they are interacting with for this upgrade strategy to
-be able to work.
-
-```solidity
-interface Lib_AddressManager {
-    event AddressSet(string indexed _name, address _newAddress, address _oldAddress);
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-
-    function owner() public view returns (address);
-    function renounceOwnership() public;
-    function transferOwnership(address newOwner) public;
-
-    /**
-     * Changes the address associated with a particular name.
-     * @param _name String name to associate an address with.
-     * @param _address Address to associate with the name.
-     */
-    function setAddress(string memory _name, address _address) external;
-
-    /**
-     * Retrieves the address associated with a given name.
-     * @param _name Name to retrieve an address for.
-     * @return Address associated with the given name.
-     */
-    function getAddress(string memory _name) external view returns (address);
-}
-```
-
-## ProxyEOA
-
-The `ProxyEOA` is deprecated and part of the legacy account abstraction
-implementation. This functionality was deprecated as to enable EVM equivalence.
-
-```solidity
-
-interface OVM_ProxyEOA {
-    event Upgraded(address indexed implementation);
-
-    /**
-     * Changes the implementation address.
-     * @param _implementation New implementation address.
-     */
-    function upgrade(address _implementation) external;
-
-    /**
-     * Gets the address of the current implementation.
-     * @return Current implementation address.
-     */
-    function getImplementation() public returns (address);
 }
 ```
 
