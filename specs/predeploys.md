@@ -457,7 +457,7 @@ It is being deprecated in bedrock but its API should still function as to
 enable backwards compatibility.
 
 ```solidity
-contract OVM_GasPriceOracle {
+interface OVM_GasPriceOracle {
     /**
      * @dev Returns the current gas price on L2
      */
@@ -621,7 +621,7 @@ The `Withdrawer` is responsible for handling L2 to L1 interactions.
  * @notice The Withdrawer contract facilitates sending both ETH value and data from L2 to L1.
  * It is predeployed in the L2 state at address 0x4200000000000000000000000000000000000016.
  */
-contract Withdrawer {
+interface Withdrawer {
     /**
      * @notice Emitted any time a withdrawal is initiated.
      * @param nonce Unique value corresponding to each withdrawal.
