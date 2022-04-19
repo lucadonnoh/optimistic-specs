@@ -15,6 +15,8 @@
 - [L2StandardTokenFactory](#l2standardtokenfactory)
 - [L1BlockNumber](#l1blocknumber)
 - [OVM\_GasPriceOracle](#ovm%5C_gaspriceoracle)
+- [Reserved System Address 1](#reserved-system-address-1)
+- [Reserved System Address 2](#reserved-system-address-2)
 - [L1Attributes](#l1attributes)
 - [Withdrawer](#withdrawer)
 
@@ -41,13 +43,15 @@ or `Bedrock`.
 | OVM\_L2ToL1MessagePasser     | 0x4200000000000000000000000000000000000000 | Legacy         |
 | OVM\_DeployerWhitelist       | 0x4200000000000000000000000000000000000002 | Legacy         |
 | OVM\_ETH                     | 0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000 | Legacy         |
-| WETH                         | 0x4200000000000000000000000000000000000006 | Legacy         |
+| WETH9                        | 0x4200000000000000000000000000000000000006 | Legacy         |
 | L2CrossDomainMessenger       | 0x4200000000000000000000000000000000000007 | Legacy         |
 | L2StandardBridge             | 0x4200000000000000000000000000000000000010 | Legacy         |
 | SequencerFeeVault            | 0x4200000000000000000000000000000000000011 | Legacy         |
 | L2StandardTokenFactory       | 0x4200000000000000000000000000000000000012 | Legacy         |
 | L1BlockNumber                | 0x4200000000000000000000000000000000000013 | Legacy         |
-| GasPriceOracle               | 0x420000000000000000000000000000000000000F | Legacy         |
+| OVM\_GasPriceOracle          | 0x420000000000000000000000000000000000000F | Legacy         |
+| Reserved System Address 1    | 0x4200000000000000000000000000000000000014 | Legacy         |
+| Reserved System Address 2    | 0x4200000000000000000000000000000000000042 | Legacy         |
 | L1Attributes                 | 0x4200000000000000000000000000000000000015 | Bedrock        |
 | Withdrawer                   | 0x4200000000000000000000000000000000000016 | Bedrock        |
 
@@ -523,7 +527,6 @@ contract OVM_GasPriceOracle {
      * @param _data Unsigned RLP encoded tx, 6 elements
      * @return L1 fee that should be paid for the tx
      */
-    // slither-disable-next-line external-function
     function getL1Fee(bytes memory _data) public view returns (uint256);
 
     /**
@@ -551,6 +554,14 @@ contract OVM_GasPriceOracle {
     function getL1GasUsed(bytes memory _data) public view returns (uint256);
 }
 ```
+
+## Reserved System Address 1
+
+Reserved for future use.
+
+## Reserved System Address 2
+
+Reserved for future use.
 
 ## L1Attributes
 
