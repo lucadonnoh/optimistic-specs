@@ -565,7 +565,9 @@ Reserved for future use.
 
 ## L1Attributes
 
-This contract was introduced in bedrock and is responsible for
+[l1-attr-predeploy]: glossary.md#l1-attributes-predeployed-contract
+
+The [L1Attributes](l1-attr-predeploy) was introduced in bedrock and is responsible for
 mainting L1 context in L2. This allows for L1 state to be accessed in L2.
 
 ```solidity
