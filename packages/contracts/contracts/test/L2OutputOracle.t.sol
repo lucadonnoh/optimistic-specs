@@ -2,7 +2,7 @@
 pragma solidity 0.8.10;
 
 /* Testing utilities */
-import { CommonTest } from "./CommonTest.t.sol";
+import { L2OutputOracle_Initializer } from "./CommonTest.t.sol";
 
 import {
     Lib_PredeployAddresses
@@ -13,42 +13,6 @@ import { L2OutputOracle } from "../L1/L2OutputOracle.sol";
 import { LibRLP } from "./Lib_RLP.t.sol";
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-
-contract L2OutputOracle_Initializer is CommonTest {
-    // Utility variables
-    uint256 appendedTimestamp;
-
-    // Test target
-    L2OutputOracle oracle;
-
-    // Constructor arguments
-    address sequencer = 0x000000000000000000000000000000000000AbBa;
-    uint256 submissionInterval = 1800;
-    uint256 l2BlockTime = 2;
-    bytes32 genesisL2Output = keccak256(abi.encode(0));
-    uint256 historicalTotalBlocks = 100;
-
-    // Cache of the initial L2 timestamp
-    uint256 startingBlockTimestamp;
-
-    // By default the first block has timestamp zero, which will cause underflows in the tests
-    uint256 initTime = 1000;
-
-    constructor() {
-        // Move time forward so we have a non-zero starting timestamp
-        vm.warp(initTime);
-        // Deploy the L2OutputOracle and transfer owernship to the sequencer
-        oracle = new L2OutputOracle(
-            submissionInterval,
-            l2BlockTime,
-            genesisL2Output,
-            historicalTotalBlocks,
-            initTime,
-            sequencer
-        );
-        startingBlockTimestamp = block.timestamp;
-    }
-}
 
 // Define this test in a standalone contract to ensure it runs immediately after the constructor.
 contract L2OutputOracleTest_Constructor is L2OutputOracle_Initializer {
