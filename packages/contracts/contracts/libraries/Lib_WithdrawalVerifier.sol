@@ -31,7 +31,7 @@ library WithdrawalVerifier {
      * @param _gasLimit Gas to be forwarded to the target.
      * @param _data Data to send to the target.
      */
-    function _deriveWithdrawalHash(
+    function withdrawalHash(
         uint256 _nonce,
         address _sender,
         address _target,

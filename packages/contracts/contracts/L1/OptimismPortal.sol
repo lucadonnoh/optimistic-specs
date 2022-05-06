@@ -178,7 +178,7 @@ contract OptimismPortal {
 
         // Verify that the hash of the withdrawal transaction's arguments are included in the
         // storage hash of the withdrawer contract.
-        bytes32 withdrawalHash = WithdrawalVerifier._deriveWithdrawalHash(
+        bytes32 withdrawalHash = WithdrawalVerifier.withdrawalHash(
             _nonce,
             _sender,
             _target,

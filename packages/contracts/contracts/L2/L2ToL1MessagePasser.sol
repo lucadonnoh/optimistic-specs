@@ -2,11 +2,7 @@
 pragma solidity ^0.8.9;
 
 /* Library Imports */
-import { AddressAliasHelper } from "@eth-optimism/contracts/standards/AddressAliasHelper.sol";
 import { WithdrawalVerifier } from "../libraries/Lib_WithdrawalVerifier.sol";
-import {
-    Lib_PredeployAddresses
-} from "@eth-optimism/contracts/libraries/constants/Lib_PredeployAddresses.sol";
 
 /* Interaction imports */
 import { Burner } from "./Burner.sol";
@@ -68,7 +64,7 @@ contract L2ToL1MessagePasser {
         uint256 _gasLimit,
         bytes memory _data
     ) public payable {
-        bytes32 withdrawalHash = WithdrawalVerifier._deriveWithdrawalHash(
+        bytes32 withdrawalHash = WithdrawalVerifier.withdrawalHash(
             nonce,
             msg.sender,
             _target,
