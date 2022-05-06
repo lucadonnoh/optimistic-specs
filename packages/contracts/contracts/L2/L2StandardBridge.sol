@@ -31,6 +31,13 @@ contract L2StandardBridge is StandardBridge {
      * Public Functions *
      ********************/
 
+    function initialize(StandardBridge _otherBridge) public {
+        _initialize(
+            CrossDomainMessenger(Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER),
+            _otherBridge
+        );
+    }
+
     function withdraw(
         address _l2Token,
         uint256 _amount,

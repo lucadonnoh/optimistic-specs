@@ -89,6 +89,8 @@ abstract contract StandardBridge {
      ********************/
 
     function donateETH() external payable {}
+    // TODO: do we want a donateERC20 function as well?
+    // it would simply transferFrom and then update deposits
 
     receive() external payable onlyEOA {
         _initiateBridgeETH(msg.sender, msg.sender, msg.value, 200_000, bytes(""));
@@ -244,9 +246,10 @@ abstract contract StandardBridge {
         view
         returns (bool)
     {
+        // TODO: compute the correct 4bytes
         return (
             (ERC165Checker.supportsInterface(_localToken, 0x1d1d8b63) && _remoteToken == OptimismMintableERC20(_localToken).l1Token()) ||
-            (ERC165Checker.supportsInterface(_localToken, 0xFFFFFFFF) && _remoteToken == OptimismMintableERC20(_localToken).l2Token())
+            (ERC165Checker.supportsInterface(_localToken, 0xFFFFFFFF) && _remoteToken == OptimismMintableERC20(_localToken).remoteToken())
         );
     }
 }

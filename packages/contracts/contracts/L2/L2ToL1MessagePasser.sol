@@ -8,7 +8,7 @@ import { WithdrawalVerifier } from "../libraries/Lib_WithdrawalVerifier.sol";
 import { Burner } from "./Burner.sol";
 
 /**
- * @title L2ToL1MessagePasser
+ * @title L2OptimismPortal
  */
 contract L2ToL1MessagePasser {
     /**********
@@ -49,6 +49,7 @@ contract L2ToL1MessagePasser {
      * Public Functions *
      ********************/
 
+    // TODO: maybe this should be only EOA
     receive() external payable {
         initiateWithdrawal(msg.sender, 100000, bytes(""));
     }

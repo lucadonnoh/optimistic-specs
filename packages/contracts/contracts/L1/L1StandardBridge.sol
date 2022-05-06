@@ -14,6 +14,7 @@ import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import { StandardBridge } from "../universal/StandardBridge.sol";
+import { CrossDomainMessenger } from "../universal/CrossDomainMessenger.sol";
 
 /**
  * @title L1StandardBridge
@@ -62,6 +63,13 @@ contract L1StandardBridge is StandardBridge {
     /********************
      * Public Functions *
      ********************/
+
+    function initialize(CrossDomainMessenger _messenger) public {
+        _initialize(
+            _messenger,
+            StandardBridge(payable(Lib_PredeployAddresses.L2_STANDARD_BRIDGE))
+        );
+    }
 
     function depositETH(uint32 _minGasLimit, bytes calldata _data) external payable onlyEOA {
         _initiateETHDeposit(msg.sender, msg.sender, _minGasLimit, _data);
