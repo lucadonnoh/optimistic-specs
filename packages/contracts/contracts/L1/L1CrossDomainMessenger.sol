@@ -30,7 +30,7 @@ contract L1CrossDomainMessenger is CrossDomainMessenger {
      * Public Functions *
      ********************/
 
-    function initialize(OptimismPortal _portal) external initializer {
+    function initialize(OptimismPortal _portal) external {
         portal = _portal;
 
         address[] memory blockedSystemAddresses = new address[](1);

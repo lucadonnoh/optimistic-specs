@@ -13,6 +13,7 @@ import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import { CrossDomainMessenger } from "./CrossDomainMessenger.sol";
+import { OptimismMintableERC20 } from "./OptimismMintableERC20.sol";
 
 abstract contract StandardBridge {
     using SafeERC20 for IERC20;

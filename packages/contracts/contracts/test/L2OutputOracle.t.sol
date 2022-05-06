@@ -53,15 +53,16 @@ contract L2OutputOracle_Initializer is CommonTest {
 // Define this test in a standalone contract to ensure it runs immediately after the constructor.
 contract L2OutputOracleTest_Constructor is L2OutputOracle_Initializer {
     function test_constructor() external {
-        /*
         assertEq(oracle.owner(), sequencer);
         assertEq(oracle.SUBMISSION_INTERVAL(), submissionInterval);
         assertEq(oracle.L2_BLOCK_TIME(), l2BlockTime);
         assertEq(oracle.HISTORICAL_TOTAL_BLOCKS(), historicalTotalBlocks);
         assertEq(oracle.latestBlockTimestamp(), startingBlockTimestamp);
         assertEq(oracle.STARTING_BLOCK_TIMESTAMP(), startingBlockTimestamp);
-        assertEq(oracle.getL2Output(startingBlockTimestamp), genesisL2Output);
-        */
+
+        L2OutputOracle.OutputProposal memory proposal = oracle.getL2Output(startingBlockTimestamp);
+        assertEq(proposal.outputRoot, genesisL2Output);
+        assertEq(proposal.timestamp, initTime);
     }
 }
 
@@ -88,9 +89,13 @@ contract L2OutputOracleTest is L2OutputOracle_Initializer {
 
     // Test: getL2Output() should return the correct value
     function test_getL2Output() external {
-        assertEq(true, false);
-        // assertEq(oracle.getL2Output(appendedTimestamp), appendedOutput1);
-        // assertEq(oracle.getL2Output(appendedTimestamp + 1), 0);
+        L2OutputOracle.OutputProposal memory proposal = oracle.getL2Output(appendedTimestamp);
+        assertEq(proposal.outputRoot, appendedOutput1);
+        assertEq(proposal.timestamp, appendedTimestamp + 1);
+
+        L2OutputOracle.OutputProposal memory proposal2 = oracle.getL2Output(appendedTimestamp + 1);
+        assertEq(proposal2.outputRoot, bytes32(0));
+        assertEq(proposal2.timestamp, 0);
 
     }
 
@@ -120,6 +125,7 @@ contract L2OutputOracleTest is L2OutputOracle_Initializer {
         expected = historicalTotalBlocks + 1 + (33 / l2BlockTime);
         assertEq(oracle.computeL2BlockNumber(argTimestamp), expected);
     }
+
     // Test: computeL2BlockNumber() fails with a blockNumber from before the startingBlockTimestamp
     function testCannot_computePreHistoricalL2BlockNumber() external {
         bytes memory expectedError = "Timestamp prior to startingBlockTimestamp";
@@ -135,8 +141,6 @@ contract L2OutputOracleTest is L2OutputOracle_Initializer {
     // Test: appendL2Output succeeds when given valid input, and no block hash and number are
     // specified.
     function test_appendingAnotherOutput() external {
-        assertEq(false, true);
-        /*
         bytes32 appendedOutput2 = keccak256(abi.encode(2));
         uint256 nextTimestamp = oracle.nextTimestamp();
 
@@ -146,7 +150,6 @@ contract L2OutputOracleTest is L2OutputOracle_Initializer {
         vm.warp(nextTimestamp + 1);
         vm.prank(sequencer);
         oracle.appendL2Output(appendedOutput2, nextTimestamp, 0, 0);
-        */
     }
 
     // Test: appendL2Output succeeds when given valid input, and when a block hash and number are
@@ -154,8 +157,6 @@ contract L2OutputOracleTest is L2OutputOracle_Initializer {
     // This tests is disabled (w/ skip_ prefix) because all blocks in Foundry currently have a
     // blockhash of zero.
     function skip_test_appendWithBlockhashAndHeight() external {
-        assertEq(false, true);
-        /*
         // Move ahead to block 100 so that we can reference historical blocks
         vm.roll(100);
 
@@ -170,7 +171,6 @@ contract L2OutputOracleTest is L2OutputOracle_Initializer {
         // Changing the l1BlockNumber argument should break this tests, however it does not
         // per the comment preceding this test.
         oracle.appendL2Output(nonZeroHash, nextTimestamp, l1BlockHash, l1BlockNumber);
-        */
     }
 
     /***************************
@@ -179,27 +179,22 @@ contract L2OutputOracleTest is L2OutputOracle_Initializer {
 
     // Test: appendL2Output fails if called by a party that is not the sequencer.
     function testCannot_appendOutputIfNotSequencer() external {
-        assertEq(false, true);
-        /*
         uint256 nextTimestamp = oracle.nextTimestamp();
 
+        vm.prank(address(128));
         vm.warp(nextTimestamp + 1);
         vm.expectRevert("Ownable: caller is not the owner");
         oracle.appendL2Output(nonZeroHash, nextTimestamp, 0, 0);
-        */
     }
 
     // Test: appendL2Output fails given a zero blockhash.
     function testCannot_appendEmptyOutput() external {
-        assertEq(false, true);
-        /*
         bytes32 outputToAppend = bytes32(0);
         uint256 nextTimestamp = oracle.nextTimestamp();
         vm.warp(nextTimestamp + 1);
         vm.prank(sequencer);
         vm.expectRevert("Cannot submit empty L2 output");
         oracle.appendL2Output(outputToAppend, nextTimestamp, 0, 0);
-        */
     }
 
     // Test: appendL2Output fails if the timestamp doesn't match the next expected timestamp.
@@ -253,17 +248,26 @@ contract L2OutputOracleTest is L2OutputOracle_Initializer {
      * Delete Tests *
      ****************/
 
-    event l2OutputDeleted(bytes32 indexed _l2Output, uint256 indexed _l2timestamp);
+    event l2OutputDeleted(
+        bytes32 indexed _l2Output,
+        uint256 indexed _l1Timestamp,
+        uint256 indexed _l2timestamp
+    );
+
     function test_deleteL2Output() external {
-        /*
         uint256 latestBlockTimestamp = oracle.latestBlockTimestamp();
-        bytes32 outputToDelete = oracle.getL2Output(latestBlockTimestamp);
-        bytes32 newLatestOutput = oracle.getL2Output(latestBlockTimestamp - submissionInterval);
+        L2OutputOracle.OutputProposal memory proposalToDelete = oracle.getL2Output(latestBlockTimestamp);
+
+        L2OutputOracle.OutputProposal memory newLatestOutput = oracle.getL2Output(latestBlockTimestamp - submissionInterval);
 
         vm.prank(sequencer);
         vm.expectEmit(true, true, false, false);
-        emit l2OutputDeleted(outputToDelete, latestBlockTimestamp);
-        oracle.deleteL2Output(outputToDelete);
+        emit l2OutputDeleted(
+            proposalToDelete.outputRoot,
+            proposalToDelete.timestamp,
+            latestBlockTimestamp
+        );
+        oracle.deleteL2Output(proposalToDelete);
 
         // validate latestBlockTimestamp has been reduced
         uint256 latestBlockTimestampAfter = oracle.latestBlockTimestamp();
@@ -272,30 +276,26 @@ contract L2OutputOracleTest is L2OutputOracle_Initializer {
             latestBlockTimestampAfter
         );
 
+        L2OutputOracle.OutputProposal memory proposal = oracle.getL2Output(latestBlockTimestampAfter);
         // validate that the new latest output is as expected.
-        assertEq(
-            newLatestOutput,
-            oracle.getL2Output(latestBlockTimestampAfter)
-        );
-        */
+        assertEq(newLatestOutput.outputRoot, proposal.outputRoot);
+        assertEq(newLatestOutput.timestamp, proposal.timestamp);
     }
 
     function testCannot_deleteL2Output_ifNotSequencer() external {
-        /*
         uint256 latestBlockTimestamp = oracle.latestBlockTimestamp();
-        bytes32 outputToDelete = oracle.getL2Output(latestBlockTimestamp);
+        L2OutputOracle.OutputProposal memory proposal = oracle.getL2Output(latestBlockTimestamp);
 
         vm.expectRevert("Ownable: caller is not the owner");
-        oracle.deleteL2Output(outputToDelete);
+        oracle.deleteL2Output(proposal);
     }
 
     function testCannot_deleteL2Output_ifWrongOutput() external {
         uint256 previousBlockTimestamp = oracle.latestBlockTimestamp() - submissionInterval;
-        bytes32 outputToDelete = oracle.getL2Output(previousBlockTimestamp);
+        L2OutputOracle.OutputProposal memory proposalToDelete = oracle.getL2Output(previousBlockTimestamp);
 
         vm.prank(sequencer);
         vm.expectRevert("Can only delete the most recent output.");
-        oracle.deleteL2Output(outputToDelete);
-        */
+        oracle.deleteL2Output(proposalToDelete);
     }
 }

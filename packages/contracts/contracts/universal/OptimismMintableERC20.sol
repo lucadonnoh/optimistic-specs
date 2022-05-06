@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../interfaces/IL2StandardERC20.sol";
 
-contract L2StandardERC20 is IL2StandardERC20, ERC20 {
+contract OptimismMintableERC20 is IL2StandardERC20, ERC20 {
     address public l1Token;
     address public l2Bridge;
 
@@ -22,6 +22,10 @@ contract L2StandardERC20 is IL2StandardERC20, ERC20 {
     ) ERC20(_name, _symbol) {
         l1Token = _l1Token;
         l2Bridge = _l2Bridge;
+    }
+
+    function l2Token() public view returns (address) {
+        return address(this);
     }
 
     modifier onlyL2Bridge() {

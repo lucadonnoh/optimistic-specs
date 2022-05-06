@@ -52,7 +52,7 @@ abstract contract CrossDomainMessenger is
      * Constants *
      *************/
 
-    uint16 constant MESSAGE_VERSION = 1;
+    uint16 constant public MESSAGE_VERSION = 1;
 
     /*************
      * Variables *
@@ -171,6 +171,8 @@ abstract contract CrossDomainMessenger is
             // Should never happen.
             require(msg.value == _value, "Mismatched message value.");
         } else {
+            // TODO(tynes): could require that msg.value == 0 here
+            // to prevent eth from getting stuck
             require(receivedMessages[versionedHash], "Message cannot be replayed.");
         }
 
